@@ -5,16 +5,32 @@ const { generarJWT } = require('../helpers/jwt');
 const Usuario = require('../models/usuario');
 
 const getUsuarios = async(req, resp) => {
-    const usuarios = await Usuario.find({}, 'nombre apellido1 email role google');
+    const desde = Number(req.query.desde) || 0;
+
+    // const usuarios = await Usuario
+    //     .find({}, 'nombre apellido1 email role google')
+    //     .skip(desde)
+    //     .limit(5);
+    // const total = await Usuario.countDocuments();
+
+    const [usuarios, total] = await Promise.all([
+        Usuario
+        .find({}, 'nombre apellido1 email role google')
+        .skip(desde)
+        .limit(5),
+
+        Usuario.countDocuments()
+
+    ]);
+
 
     resp
-    //.status(404)
         .json({
-        ok: true,
-        msg: 'Listando usuarios',
-        // uid: req.uid,
-        usuarios
-    });
+            ok: true,
+            msg: 'Listando usuarios',
+            usuarios,
+            totalUsuarios: total
+        });
 };
 
 const postUsuario = async(req, resp = response) => {
