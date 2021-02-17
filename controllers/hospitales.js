@@ -47,6 +47,43 @@ const postHospitales = async(req, resp = response) => {
 
 const putHospitales = async(req, resp = response) => {
 
+    const uid = req.uid;
+    const id = req.params.id;
+    try {
+        const hospitalDB = await Hospital.findById(id);
+
+        if (!hospitalDB) {
+            return resp.status(404).json({
+                ok: false,
+                msg: 'No existe el hospital con ese ID'
+            });
+        }
+
+        const cambiosHospital = {
+            ...req.body,
+            usuario: uid
+        };
+
+        const hospitalActualizado = await Hospital.findByIdAndUpdate(id, cambiosHospital, { new: true });
+
+        resp
+            .json({
+                ok: true,
+                msg: 'Actualizado hospital',
+                hospital: hospitalActualizado
+            });
+
+    } catch (error) {
+        console.log(error);
+        resp.status(500).json({
+            ok: false,
+            msg: 'Error inesperado'
+        });
+    }
+
+
+
+
     resp
         .json({
             ok: true,
@@ -56,13 +93,33 @@ const putHospitales = async(req, resp = response) => {
 };
 
 const deleteHospitales = async(req, resp = response) => {
+    const id = req.params.id;
+    try {
+        const hospitalDB = await Hospital.findById(id);
 
-    resp
-        .json({
-            ok: true,
-            msg: 'Borrar hospitales',
-            //hospitales
+        if (!hospitalDB) {
+            return resp.status(404).json({
+                ok: false,
+                msg: 'No existe el hospital con ese ID'
+            });
+        }
+
+        await Hospital.findByIdAndDelete(id);
+
+        resp
+            .json({
+                ok: true,
+                msg: 'Borrado hospital',
+                uid
+            });
+
+    } catch (error) {
+        console.log(error);
+        resp.status(500).json({
+            ok: false,
+            msg: 'Error inesperado'
         });
+    }
 };
 
 module.exports = {

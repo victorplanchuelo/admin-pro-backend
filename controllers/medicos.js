@@ -34,7 +34,7 @@ const postMedicos = async(req, resp = response) => {
             .json({
                 ok: true,
                 msg: 'Crear médico',
-                hospital: medicoDB
+                medico: medicoDB
             });
     } catch (error) {
         resp
@@ -47,23 +47,81 @@ const postMedicos = async(req, resp = response) => {
 };
 
 const putMedicos = async(req, resp = response) => {
+    const uid = req.uid;
+    const id = req.params.id;
+
+    try {
+        const medicoDB = await Medico.findById(id);
+
+        if (!medicoDB) {
+            return resp.status(404).json({
+                ok: false,
+                msg: 'No existe el médico con ese ID'
+            });
+        }
+
+        const cambiosMedico = {
+            ...req.body,
+            usuario: uid
+        };
+
+        const medicoActualizado = await Medico.findByIdAndUpdate(id, cambiosMedico, { new: true });
+
+        resp
+            .json({
+                ok: true,
+                msg: 'Actualizado medico',
+                medico: medicoActualizado
+            });
+
+    } catch (error) {
+        console.log(error);
+        resp.status(500).json({
+            ok: false,
+            msg: 'Error inesperado'
+        });
+    }
+
+
+
 
     resp
         .json({
             ok: true,
-            msg: 'Actualizar medicos',
-            //medicos
+            msg: 'Actualizar hospitales',
+            //hospitales
         });
 };
 
 const deleteMedicos = async(req, resp = response) => {
 
-    resp
-        .json({
-            ok: true,
-            msg: 'Borrar medicos',
-            //medicos
+    const id = req.params.id;
+    try {
+        const medicoDB = await Medico.findById(id);
+
+        if (!medicoDB) {
+            return resp.status(404).json({
+                ok: false,
+                msg: 'No existe el médico con ese ID'
+            });
+        }
+
+        await Medico.findByIdAndDelete(id);
+
+        resp
+            .json({
+                ok: true,
+                msg: 'Borrado médico',
+                uid
+            });
+
+    } catch (error) {
+        console.log(error);
+        resp.status(500).json({
+            ok: false,
+            msg: 'Error inesperado'
         });
+    }
 };
 
 module.exports = {
