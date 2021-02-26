@@ -35,7 +35,9 @@ const postLogin = async(req, resp = response) => {
             .json({
                 ok: true,
                 msg: 'Login',
-                token
+                token,
+                usuario: usuarioBD,
+                id: usuarioBD.id
             });
     } catch (error) {
         console.log(error);
@@ -81,7 +83,9 @@ const postLoginGoogle = async(req, res = response) => {
         res.json({
             ok: true,
             msg: 'Google Signin',
-            token
+            token,
+            usuario: usuarioDB,
+            id: usuarioDB.id
         });
 
     } catch (error) {
